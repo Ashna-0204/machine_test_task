@@ -1,5 +1,7 @@
+import 'package:assignment_allisons/models/home_model.dart';
 import 'package:flutter/material.dart';
 
+import '../../api_services/api_service.dart';
 import '../../styles/colors.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,6 +12,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  late Future<HomeModel> futureHomeData;
+
+  @override
+  void initState() {
+    super.initState();
+    futureHomeData = ApiService.fetchHomeData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -127,8 +138,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 15),
+                ourProductList(),
 
+                const SizedBox(height: 15),
                 //suggestions
                 const Padding(
                   padding:  EdgeInsets.only(left: 15,right: 15),
@@ -161,6 +174,72 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         )
+    );
+  }
+
+  Widget ourProductList(){
+    return FutureBuilder<HomeModel>(
+      future: futureHomeData,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height / 1.3,
+            child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                )),
+          );
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.ourProducts!.isEmpty) {
+          return SizedBox(
+              height: MediaQuery.of(context).size.height / 1.3,
+              child: const Center(
+                  child: Text('No Data found')
+              )
+          );
+        } else {
+          final item = snapshot.data!.ourProducts ?? [];
+          return Padding(
+            padding: const EdgeInsets.only(left: 20,right: 15),
+            child: SizedBox(
+              height: 200.0,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: item.length - 1,
+                itemBuilder: (context, index) => Row(
+                  children: [
+                    Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Image.network(
+                              'https://swan.alisonsnewdemo.online/images/product/'+ '${item[index + 1].image}',
+                            height: 150,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                            '${item[index + 1].name}',
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'OMR'+'${item[index + 1].price}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: blackColor
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }
