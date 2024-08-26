@@ -111,7 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 15),
+                ourBrandList(),
+                const SizedBox(height: 15),
 
                 //products
                 const Padding(
@@ -175,6 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 suggestedProductList(),
 
                 const SizedBox(height: 14),
+                //new arrivals
                 Image.asset('assets/images/new_arrival.png'),
                 const SizedBox(height: 8),
                 newArrivalList(),
@@ -213,6 +216,55 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         )
+    );
+  }
+
+  Widget ourBrandList(){
+    return FutureBuilder<HomeModel>(
+      future: futureHomeData,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height / 1.3,
+            child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                )),
+          );
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.featuredbrands!.isEmpty) {
+          return SizedBox(
+              height: MediaQuery.of(context).size.height / 1.3,
+              child: const Center(
+                  child: Text('No Data found')
+              )
+          );
+        } else {
+          final item = snapshot.data!.featuredbrands ?? [];
+          return Padding(
+            padding: const EdgeInsets.only(left: 20,right: 15),
+            child: SizedBox(
+              height: 100.0,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: item.length - 1,
+                itemBuilder: (context, index) => Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: Image.network(
+                        'https://swan.alisonsnewdemo.online/images/category/'+ '${item[index + 1].image}',
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 
