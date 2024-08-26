@@ -1,5 +1,6 @@
 import 'package:assignment_allisons/models/home_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../api_services/api_service.dart';
 import '../../styles/colors.dart';
@@ -72,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           body: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 25),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -171,6 +173,42 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 8),
                 suggestedProductList(),
+
+                const SizedBox(height: 14),
+                Image.asset('assets/images/new_arrival.png'),
+                const SizedBox(height: 8),
+                newArrivalList(),
+
+                const SizedBox(height: 15),
+                //best seller list
+                const Padding(
+                  padding:  EdgeInsets.only(left: 15,right: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Best Sellers',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 17,
+                            color: blackColor
+                        ),
+                      ),
+
+                      Text(
+                        'View All',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                bestSellerList()
               ],
             ),
           ),
@@ -211,12 +249,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) => Row(
                   children: [
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10.0),
-                          child: Image.network(
-                              'https://swan.alisonsnewdemo.online/images/product/'+ '${item[index + 1].image}',
-                            height: 150,
+                          child: Stack(
+                            children: [
+                              Image.network(
+                                'https://swan.alisonsnewdemo.online/images/product/'+ '${item[index + 1].image}',
+                                height: 150,
+                              ),
+                              const Positioned(
+                                top: 8.0,  // Adjust the value as needed
+                                right: 8.0,
+                                child: Icon(
+                                    Icons.favorite_border,
+                                  color: blackColor,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -258,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.ourProducts!.isEmpty) {
+        } else if (!snapshot.hasData || snapshot.data!.suggestedProducts!.isEmpty) {
           return SizedBox(
               height: MediaQuery.of(context).size.height / 1.3,
               child: const Center(
@@ -277,12 +328,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) => Row(
                   children: [
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10.0),
-                          child: Image.network(
-                            'https://swan.alisonsnewdemo.online/images/product/'+ '${item[index].image}',
-                            height: 150,
+                          child: Stack(
+                            children: [
+                              Image.network(
+                                'https://swan.alisonsnewdemo.online/images/product/'+ '${item[index].image}',
+                                height: 150,
+                              ),
+                              const Positioned(
+                                top: 8.0,  // Adjust the value as needed
+                                right: 8.0,
+                                child: Icon(
+                                  Icons.favorite_border,
+                                  color: blackColor,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -297,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           'OMR'+'${item[index].price}',
                           textAlign: TextAlign.left,
                           style: const TextStyle(
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                               color: blackColor
                           ),
                         )
@@ -307,6 +371,162 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget bestSellerList(){
+    return FutureBuilder<HomeModel>(
+      future: futureHomeData,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height / 1.3,
+            child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                )),
+          );
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.bestSeller!.isEmpty) {
+          return SizedBox(
+              height: MediaQuery.of(context).size.height / 1.3,
+              child: const Center(
+                  child: Text('No Data found')
+              )
+          );
+        } else {
+          final item = snapshot.data!.bestSeller ?? [];
+          return Padding(
+            padding: const EdgeInsets.only(left: 20,right: 15),
+            child: SizedBox(
+              height: 200.0,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: item.length,
+                itemBuilder: (context, index) => Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Stack(
+                            children: [
+                              Image.network(
+                                'https://swan.alisonsnewdemo.online/images/product/'+ '${item[index].image}',
+                                height: 150,
+                              ),
+                              const Positioned(
+                                top: 8.0,  // Adjust the value as needed
+                                right: 8.0,
+                                child: Icon(
+                                  Icons.favorite_border,
+                                  color: blackColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          '${item[index].name}',
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'OMR'+'${item[index].price}',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: blackColor
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget newArrivalList(){
+    return FutureBuilder<HomeModel>(
+      future: futureHomeData,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height / 1.3,
+            child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                )),
+          );
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.bestSeller!.isEmpty) {
+          return SizedBox(
+              height: MediaQuery.of(context).size.height / 1.3,
+              child: const Center(
+                  child: Text('No Data found')
+              )
+          );
+        } else {
+          final item = snapshot.data!.bestSeller ?? [];
+          return Padding(
+            padding: const EdgeInsets.only(left: 20,right: 15),
+            child: StaggeredGridView.countBuilder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              itemCount: item.length,
+              itemBuilder: (BuildContext context, int index) => InkWell(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Image.network(
+                              'https://swan.alisonsnewdemo.online/images/product/'+
+                              '${item[index].image}'),
+                        ),
+                        const Positioned(
+                          top: 8.0,  // Adjust the value as needed
+                          right: 8.0,
+                          child: Icon(
+                            Icons.favorite_border,
+                            color: blackColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${item[index].name}'
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'OMR'+'${item[index].price}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: blackColor
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              staggeredTileBuilder: (int index) => new StaggeredTile.fit(1),
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
             ),
           );
         }
